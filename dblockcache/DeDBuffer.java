@@ -42,6 +42,8 @@ public class DeDBuffer extends DBuffer {
 	@Override
 	public boolean waitValid() {
 		// TODO Auto-generated method stub
+		// calls virtualDisk fetch method, which will notify the following wait
+		// wait
 		return false;
 	}
 
@@ -65,11 +67,25 @@ public class DeDBuffer extends DBuffer {
 	@Override
 	public int read(byte[] buffer, int startOffset, int count) {
 		// TODO Auto-generated method stub
+		// check valid
+		// check clean
+		// check busy
+		this.isBusy = false;
+		// read data
+		this.isBusy = true;
 		return 0;
 	}
 
 	@Override
 	public int write(byte[] buffer, int startOffset, int count) {
+		// TODO Auto-generated method stub
+		// check valid
+		// check clean
+		// check busy
+		this.isBusy = false;
+		// write data
+		this.isDirty = true;
+		this.isBusy = true;
 		return 0;
 	}
 
