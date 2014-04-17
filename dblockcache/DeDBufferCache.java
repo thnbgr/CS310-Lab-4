@@ -1,6 +1,10 @@
 package dblockcache;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Hashtable;
+
+import common.Constants;
 
 import virtualdisk.DeVirtualDisk;
 import virtualdisk.VirtualDisk;
@@ -9,9 +13,18 @@ public class DeDBufferCache extends DBufferCache {
 
 	Hashtable<Integer, DBuffer> myCacheTable = new Hashtable<Integer, DBuffer>();
 	VirtualDisk myVirtualDisk;
+	
 	public DeDBufferCache(int cacheSize) {
 		super(cacheSize);
-		myVirtualDisk = new DeVirtualDisk();
+		try {
+			myVirtualDisk = new DeVirtualDisk("disk", true);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -22,7 +35,11 @@ public class DeDBufferCache extends DBufferCache {
 	 * contents of buffer into block in virtualDisk */
 	
 	public DBuffer getBlock(int blockID) {
-		Integer i = blockID;
+		if (isFull()) {
+			// deal with eviction
+		}
+		
+ 		Integer i = blockID;
 		if (myCacheTable.contains(i)) {
 			return myCacheTable.get(i);
 		} else {
@@ -42,6 +59,13 @@ public class DeDBufferCache extends DBufferCache {
 	public void sync() {
 		// Calls startFetch/startPush
 		
+	}
+	
+	private boolean isFull() {
+		if (myCacheTable.size() > Constants.NUM_OF_CACHE_BLOCKS) {
+			return true;
+		}
+		return false;
 	}
 
 }

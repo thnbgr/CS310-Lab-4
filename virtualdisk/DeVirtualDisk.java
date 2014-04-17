@@ -11,7 +11,6 @@ public class DeVirtualDisk extends VirtualDisk {
 	public DeVirtualDisk(String volName, boolean format)
 			throws FileNotFoundException, IOException {
 		super(volName, format);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -22,7 +21,7 @@ public class DeVirtualDisk extends VirtualDisk {
 		} else if (operation == DiskOperationType.WRITE) {
 			writeBlock(buf);
 		}
-		
+
 		// Somewhere this happens
 		buf.ioComplete();
 	}

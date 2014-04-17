@@ -70,14 +70,12 @@ public class DeDBuffer extends DBuffer {
 
 	@Override
 	public int write(byte[] buffer, int startOffset, int count) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	/* called when an IO is completed by VirtualDisk (?) */
 	public void ioComplete() {
-		// TODO Auto-generated method stub
 
 	}
 
