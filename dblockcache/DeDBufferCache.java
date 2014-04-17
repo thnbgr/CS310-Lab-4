@@ -1,17 +1,23 @@
 package dblockcache;
 
-import java.util.Hashtable;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
 
-import virtualdisk.DeVirtualDisk;
-import virtualdisk.VirtualDisk;
+import virtualdisk.*;
+import common.*;
 
 public class DeDBufferCache extends DBufferCache {
 
-	Hashtable<Integer, DBuffer> myCacheTable = new Hashtable<Integer, DBuffer>();
+	Hashtable<Integer, DeDBuffer> myCacheTable = new Hashtable<Integer, DeDBuffer>();
+	LinkedList<Integer> myBufferQueue = new LinkedList<Integer>();
 	VirtualDisk myVirtualDisk;
-	public DeDBufferCache(int cacheSize) {
+	
+	private int numBuffers = Constants.NUM_OF_CACHE_BLOCKS;
+	
+	public DeDBufferCache(int cacheSize) throws FileNotFoundException, IOException {
 		super(cacheSize);
-		myVirtualDisk = new DeVirtualDisk();
+		myVirtualDisk = new DeVirtualDisk("myVD",true);
 	}
 
 	@Override
@@ -24,16 +30,32 @@ public class DeDBufferCache extends DBufferCache {
 	public DBuffer getBlock(int blockID) {
 		Integer i = blockID;
 		if (myCacheTable.contains(i)) {
-			return myCacheTable.get(i);
-		} else {
-			// allocate a dbuffer
-			return new DeDBuffer(blockID);
+			DeDBuffer calledBuffer = myCacheTable.get(i);
+			myBufferQueue.remove(i);
+			myBufferQueue.add(i);
+			return calledBuffer;
+		}
+		else {
+			DeDBuffer newBuffer = new DeDBuffer(i);
+			if (myCacheTable.size() == numBuffers) {
+				DeDBuffer evictBuffer = myCacheTable.get(myBufferQueue.get(0));
+				Integer evictID = evictBuffer.getBlockID();
+				if (!evictBuffer.checkClean()) {
+					evictBuffer.startPush();
+				}
+				this.releaseBlock(evictBuffer);
+				myBufferQueue.remove(evictID);
+			}
+			myCacheTable.put(i, newBuffer);
+			myBufferQueue.add(i);
+			return newBuffer;
 		}
 	}
 
 	@Override
 	public void releaseBlock(DBuffer buf) {
-		myCacheTable.remove(buf);
+		int evictID = buf.getBlockID();
+		myCacheTable.remove(evictID);
 	}
 
 	@Override
@@ -41,6 +63,8 @@ public class DeDBufferCache extends DBufferCache {
 	*/
 	public void sync() {
 		// Calls startFetch/startPush
+		// Check all buffers for clean/dirty
+		// Push all dirty buffers, wait for completion
 		
 	}
 
