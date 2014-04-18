@@ -11,7 +11,7 @@ public class DeDBufferCache extends DBufferCache {
 
 	Hashtable<Integer, DeDBuffer> myCacheTable = new Hashtable<Integer, DeDBuffer>();
 	LinkedList<Integer> myBufferQueue = new LinkedList<Integer>();
-	VirtualDisk myVirtualDisk;
+	static VirtualDisk myVirtualDisk;
 	private int numBuffers = Constants.NUM_OF_CACHE_BLOCKS;
 	
 	public DeDBufferCache(int cacheSize) {
@@ -35,38 +35,44 @@ public class DeDBufferCache extends DBufferCache {
 	 * contents of buffer into block in virtualDisk */
 	
 	public DBuffer getBlock(int blockID) {
-		if (isFull()) {
-			// deal with eviction
-		}
-		
  		Integer i = blockID;
+ 		DeDBuffer returnBuffer = new DeDBuffer(i, myVirtualDisk);
 		if (myCacheTable.contains(i)) {
-			DeDBuffer calledBuffer = myCacheTable.get(i);
+			returnBuffer = myCacheTable.get(i);
 			myBufferQueue.remove(i);
 			myBufferQueue.add(i);
-			return calledBuffer;
 		}
 		else {
-			DeDBuffer newBuffer = new DeDBuffer(i);
-			if (myCacheTable.size() == numBuffers) {
+			if (isFull()) {
 				DeDBuffer evictBuffer = myCacheTable.get(myBufferQueue.get(0));
 				Integer evictID = evictBuffer.getBlockID();
 				if (!evictBuffer.checkClean()) {
 					evictBuffer.startPush();
 				}
-				this.releaseBlock(evictBuffer);
+				myCacheTable.remove(evictID);
 				myBufferQueue.remove(evictID);
 			}
-			myCacheTable.put(i, newBuffer);
+			myCacheTable.put(i, returnBuffer);
 			myBufferQueue.add(i);
-			return newBuffer;
 		}
+		returnBuffer.startFetch();
+		while (returnBuffer.isBusy()) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		returnBuffer.isBusy = true;
+		return returnBuffer;
 	}
 
 	@Override
 	public void releaseBlock(DBuffer buf) {
-		int evictID = buf.getBlockID();
-		myCacheTable.remove(evictID);
+		DeDBuffer buffer = (DeDBuffer) buf;
+		buffer.isBusy = false;
+		notify();
 	}
 
 	@Override

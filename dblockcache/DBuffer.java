@@ -12,7 +12,7 @@ public abstract class DBuffer {
 	public abstract boolean checkValid();
 	
 	/* Wait until the buffer has valid data, i.e., wait for fetch to complete */
-	public abstract boolean waitValid();
+	public abstract boolean waitValid() throws InterruptedException;
 	
 	/* Check whether the buffer is dirty, i.e., has modified data written back to disk? */
 	public abstract boolean checkClean();

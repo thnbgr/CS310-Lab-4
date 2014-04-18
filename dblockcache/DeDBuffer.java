@@ -1,5 +1,11 @@
 package dblockcache;
 
+import java.io.IOException;
+
+import virtualdisk.VirtualDisk;
+import common.Constants.DiskOperationType;
+
+
 public class DeDBuffer extends DBuffer {
 
 	/*
@@ -10,27 +16,52 @@ public class DeDBuffer extends DBuffer {
 
 	/* Have some sort of data structure to store metadata */
 
+	VirtualDisk myVirtualDisk;
 	private int myBlockID;
 	private byte[] myBuffer;
-	private boolean isDirty;
-	private boolean isBusy;
+	protected boolean isValid;
+	protected boolean isDirty;
+	public boolean isBusy;
 
-	public DeDBuffer(int i) {
+	public DeDBuffer(int i, VirtualDisk v) {
 		myBlockID = i;
 		isDirty = false;
 		isBusy = false;
+		myVirtualDisk =  v;
 	}
 
 	@Override
 	public void startFetch() {
 		// TODO Auto-generated method stub
-
+		isValid = false;
+		
+		try {
+			myVirtualDisk.startRequest(this, DiskOperationType.READ);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// When it completes fetching:
+		// set the valid condition to return true
 	}
 
 	@Override
 	public void startPush() {
 		// TODO Auto-generated method stub
-
+		try {
+			myVirtualDisk.startRequest(this, DiskOperationType.WRITE);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// When it completes pushing:
+		// set the dirty condition to return false
 	}
 
 	@Override
@@ -40,11 +71,15 @@ public class DeDBuffer extends DBuffer {
 	}
 
 	@Override
-	public boolean waitValid() {
+	public synchronized boolean waitValid() throws InterruptedException {
 		// TODO Auto-generated method stub
 		// calls virtualDisk fetch method, which will notify the following wait
 		// wait
-		return false;
+		while(!checkValid())
+		{
+			wait();
+		}
+		return true;
 	}
 
 	@Override
@@ -66,47 +101,55 @@ public class DeDBuffer extends DBuffer {
 
 	@Override
 	public int read(byte[] buffer, int startOffset, int count) {
+		// TODO Auto-generated method stub
 		// check valid
-		// check clean
-		// check busy
-		this.isBusy = false;
+		try {
+			waitValid();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// read data
-		this.isBusy = true;
+		for (int i=0; i<count; i++) {
+			myBuffer[count] = buffer[startOffset];
+			startOffset++;
+		}
 		return 0;
 	}
 
 	@Override
 	public int write(byte[] buffer, int startOffset, int count) {
+		// TODO Auto-generated method stub
 		// check valid
-		// check clean
-		// check busy
-		this.isBusy = false;
-		// write data
-		this.isDirty = true;
-		this.isBusy = true;
+		try {
+			waitValid();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// read data
+		for (int i=0; i<count; i++) {
+			buffer[startOffset] = myBuffer[count];
+			startOffset++;
+		}
+		isDirty = true;
 		return 0;
 	}
 
 	@Override
 	/* called when an IO is completed by VirtualDisk (?) */
+	// This is what notifies
 	public void ioComplete() {
-
+		isValid = true;
+		notify();
 	}
 
 	@Override
 	public int getBlockID() {
 		return myBlockID;
 	}
-	
-	// Returns the entire contents of the block in a byte array
-	public byte[] getBlockContents() {
-		return null;
-	}
 
 	@Override
-	/* 
-	 * Simply returns a buffer to read into or write from
-	 */
 	public byte[] getBuffer() {
 		return myBuffer;
 	}
