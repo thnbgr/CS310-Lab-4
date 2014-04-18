@@ -62,7 +62,7 @@ public class DeDFS extends DFS {
 	public int read(DFileID dFID, byte[] buffer, int startOffset, int count) {
 		// First, get inode
 		DeDBuffer inodeBuffer = getInodeBuffer(dFID);
-		byte[] content = inodeBuffer.getBuffer(); // get the whole block
+		byte[] content = inodeBuffer.getBlockContents(); // get the whole block
 
 		InputStream is = null;
 		BufferedReader bfReader = null;
@@ -76,7 +76,7 @@ public class DeDFS extends DFS {
 			while ((temp = bfReader.read()) != null) { // Reading from inode
 				// Read each block
 				DeDBuffer b = (DeDBuffer) myBufferCache.getBlock(temp);
-				byte[] tempBuffer = b.getBuffer();
+				byte[] tempBuffer = b.getBlockContents();
 				int tempLength = tempBuffer.length;
 				offset += tempLength;
 				// writes to return buffer

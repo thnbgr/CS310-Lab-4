@@ -98,6 +98,7 @@ public class DeDBuffer extends DBuffer {
 		return myBlockID;
 	}
 	
+	// Returns the entire contents of the block in a byte array
 	public byte[] getBlockContents() {
 		return null;
 	}
