@@ -1,5 +1,10 @@
 package dfs;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,12 +19,12 @@ public class DeDFS extends DFS {
 
 	DeDBufferCache myBufferCache;
 	DFileID[] myDFileIDs;
-	
+
 	@Override
 	public void init() {
 		myDFileIDs = new DFileID[Constants.MAX_DFILES];
 		myBufferCache = new DeDBufferCache(Constants.NUM_OF_CACHE_BLOCKS);
-		
+
 		for (int i = 0; i < Constants.MAX_DFILES; i++) {
 			DeDBuffer buffer = (DeDBuffer) myBufferCache.getBlock(i);
 			// First int is the file size
@@ -38,7 +43,7 @@ public class DeDFS extends DFS {
 				currentOffset += d.length;
 			}
 			// Done allocating the inode
-			
+
 		}
 	}
 
@@ -62,16 +67,46 @@ public class DeDFS extends DFS {
 			}
 		}
 	}
-	
+
 	private void updateInode() {
-		
+
 	}
 
 	@Override
 	public int read(DFileID dFID, byte[] buffer, int startOffset, int count) {
-		// TODO Auto-generated method stub
-		// for (int i = 0; i < buffer.length; i+=BLOCK_SIZE) {
-			// get a block, write BLOCK_SIZE length of data from buffer, update inode
+		// First, get inode
+		DeDBuffer inodeBuffer = getInodeBuffer(dFID);
+		byte[] content = inodeBuffer.getBuffer(); // get the whole block
+
+		InputStream is = null;
+		BufferedReader bfReader = null;
+		try {
+			is = new ByteArrayInputStream(content);
+			bfReader = new BufferedReader(new InputStreamReader(is));
+			Integer temp;
+			int size = bfReader.read(); // reads first int of inode block
+			int offset = 0;
+			buffer = new byte[size]; // instantiates byte array of size of file
+			while ((temp = bfReader.read()) != null) { // Reading from inode
+				DeDBuffer b = (DeDBuffer) myBufferCache.getBlock(temp); // Read each block
+				byte[] tempBuffer = b.getBuffer();
+				int tempLength = tempBuffer.length;
+				offset += tempLength;
+				System.arraycopy(tempBuffer, 0, buffer, offset, tempLength); // writes to return buffer
+				
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (is != null)
+					is.close();
+			} catch (Exception ex) {
+			}
+		
+		}
+
 		return 0;
 	}
 
@@ -82,10 +117,19 @@ public class DeDFS extends DFS {
 		return 0;
 	}
 
+	private DeDBuffer getInodeBuffer(DFileID dFID) {
+		DeDBuffer b = (DeDBuffer) myBufferCache.getBlock(dFID.getDFileID());
+		return b;
+	}
+
 	@Override
 	public int sizeDFile(DFileID dFID) {
-		// read first four bytes at dFID.getBlockID()*block size
-		return 0;
+		DeDBuffer b = (DeDBuffer) myBufferCache.getBlock(dFID.getDFileID());
+		byte[] buffer = null;
+		b.read(buffer, 0, 4);
+		ByteBuffer wrapped = ByteBuffer.wrap(buffer);
+		int num = wrapped.getInt();
+		return num;
 	}
 
 	@Override
@@ -96,7 +140,7 @@ public class DeDFS extends DFS {
 	@Override
 	public void sync() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

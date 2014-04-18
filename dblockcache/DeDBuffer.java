@@ -66,7 +66,6 @@ public class DeDBuffer extends DBuffer {
 
 	@Override
 	public int read(byte[] buffer, int startOffset, int count) {
-		// TODO Auto-generated method stub
 		// check valid
 		// check clean
 		// check busy
@@ -78,7 +77,6 @@ public class DeDBuffer extends DBuffer {
 
 	@Override
 	public int write(byte[] buffer, int startOffset, int count) {
-		// TODO Auto-generated method stub
 		// check valid
 		// check clean
 		// check busy
