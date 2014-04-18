@@ -106,6 +106,7 @@ public abstract class VirtualDisk implements IVirtualDisk {
 		}
 		_file.seek(seekLen);
 		return _file.read(buf.getBuffer(), 0, Constants.BLOCK_SIZE);
+		
 	}
 
 	/*

@@ -97,8 +97,15 @@ public class DeDBuffer extends DBuffer {
 	public int getBlockID() {
 		return myBlockID;
 	}
+	
+	public byte[] getBlockContents() {
+		return null;
+	}
 
 	@Override
+	/* 
+	 * Simply returns a buffer to read into or write from
+	 */
 	public byte[] getBuffer() {
 		return myBuffer;
 	}
