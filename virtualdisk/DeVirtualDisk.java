@@ -26,17 +26,6 @@ public class DeVirtualDisk extends VirtualDisk {
 	
 		RequestBuffer r = new RequestBuffer(buf, operation);
 		requests.add(r);
-		
-		
-		
-		/*	if (operation == DiskOperationType.READ) {
-			int r = readBlock(buf);
-		} else if (operation == DiskOperationType.WRITE) {
-			writeBlock(buf);
-		}
-		 */
-		// Somewhere this happens
-		buf.ioComplete();
 	}
 
 	public void handleRequests() throws InterruptedException, IOException{
@@ -53,5 +42,6 @@ public class DeVirtualDisk extends VirtualDisk {
 	    } else if (r.myOperation == DiskOperationType.WRITE) {
 		    writeBlock(r.mybuff);
 	    }
+	    r.mybuff.ioComplete();
 	}
 }

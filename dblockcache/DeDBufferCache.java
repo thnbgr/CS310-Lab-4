@@ -72,7 +72,7 @@ public class DeDBufferCache extends DBufferCache {
 	public void releaseBlock(DBuffer buf) {
 		DeDBuffer buffer = (DeDBuffer) buf;
 		buffer.isBusy = false;
-		notify();
+		notifyAll();
 	}
 
 	@Override

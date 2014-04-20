@@ -44,8 +44,13 @@ public class DeDBuffer extends DBuffer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		// When it completes fetching:
-		// set the valid condition to return true
+		
+		try {
+			waitValid();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
