@@ -131,7 +131,7 @@ public class DeDBuffer extends DBuffer {
 		}
 		// read data
 		for (int i=0; i<count; i++) {
-			buffer[startOffset] = myBuffer[count];
+			buffer[startOffset] = myBuffer[i];
 			startOffset++;
 		}
 		return 0;
@@ -149,7 +149,7 @@ public class DeDBuffer extends DBuffer {
 		}
 		// read data
 		for (int i=0; i<count; i++) {
-			myBuffer[count] = buffer[startOffset];
+			myBuffer[i] = buffer[startOffset];
 			startOffset++;
 		}
 		isDirty = true;

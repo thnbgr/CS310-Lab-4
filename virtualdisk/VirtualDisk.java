@@ -10,6 +10,7 @@ package virtualdisk;
 import java.io.RandomAccessFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import common.Constants;
 import common.Constants.DiskOperationType;
@@ -36,14 +37,12 @@ public abstract class VirtualDisk implements IVirtualDisk {
 		 * written synchronously to the underlying storage device.
 		 */
 		_file = new RandomAccessFile(_volName, "rws");
-
-
 		/*
 		 * Set the length of the file to be NUM_OF_BLOCKS with each block of
 		 * size BLOCK_SIZE. setLength internally invokes ftruncate(2) syscall to
 		 * set the length.
 		 */
-		_file.setLength(Constants.BLOCK_SIZE * Constants.NUM_OF_BLOCKS);
+		_file.setLength(_maxVolSize);
 
 		if (format) {
 			formatStore();

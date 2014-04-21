@@ -12,13 +12,16 @@ public class DeTest {
 		DFileID file1 = myDFS.createDFile();
 		//int file1ID = file1.getDFileID();
 		byte[] myWriteBuffer = new byte[2];
-		byte[] myReadBuffer = new byte[2];
+		byte[] myReadBuffer = new byte[4];
 		myWriteBuffer[0] = 'a';
 		myWriteBuffer[1] = 'b';
 		System.out.println("Writing...");
 		myDFS.write(file1, myWriteBuffer, 0, 2);
 		System.out.println("Reading...");
 		myDFS.read(file1, myReadBuffer, 0, 2);
-		System.out.println(myReadBuffer);
+		System.out.println(fromByteArray(myReadBuffer));
+	}
+	public static int fromByteArray(byte[] bytes) {
+	     return bytes[0] << 24 | (bytes[1] & 0xFF) << 16 | (bytes[2] & 0xFF) << 8 | (bytes[3] & 0xFF);
 	}
 }
