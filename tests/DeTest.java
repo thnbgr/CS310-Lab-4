@@ -1,24 +1,25 @@
 package tests;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+
 import common.*;
 import dblockcache.*;
 import dfs.*;
 import virtualdisk.*;
 
 public class DeTest {
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, FileNotFoundException {
 		DeDFS myDFS = new DeDFS();
 		myDFS.init();
-		DFileID file1 = myDFS.createDFile();
-		//int file1ID = file1.getDFileID();
-		byte[] myWriteBuffer = new byte[2];
-		byte[] buffer = new byte[2];
-		myWriteBuffer[0] = 'a';
-		myWriteBuffer[1] = 'b';
-		System.out.println("Writing...");
-		myDFS.write(file1, myWriteBuffer, 0, 2);
-		System.out.println("Reading...");
-		myDFS.read(file1, buffer, 0, 2);
-		System.out.println(buffer[0]+" "+buffer[1]);
+		String filePath = "test1.txt";
+		File inputFile1 = new File(filePath);
+		WriterThread writer1 = new WriterThread(myDFS, inputFile1);
+		DFileID fileID1 = writer1.getFileID();
+		ReaderThread reader1 = new ReaderThread(myDFS, fileID1, 100);
+		writer1.start();
+		reader1.start();
+		String output = new String(reader1.getBuffer());
+		System.out.println("Output is: "+output);
 	}
 }
