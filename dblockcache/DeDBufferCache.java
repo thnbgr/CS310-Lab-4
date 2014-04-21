@@ -38,7 +38,7 @@ public class DeDBufferCache extends DBufferCache {
  		Integer i = blockID;
  		DeDBuffer returnBuffer = new DeDBuffer(i, myVirtualDisk);
  		System.out.println("  Getting Block "+blockID);
-		if (myCacheTable.contains(i)) {
+		if (myCacheTable.containsKey(i)) {
 			returnBuffer = myCacheTable.get(i);
 			myBufferQueue.remove(i);
 			myBufferQueue.add(i);
@@ -62,9 +62,11 @@ public class DeDBufferCache extends DBufferCache {
 				myBufferQueue.remove(evictID);
 			}
 			myCacheTable.put(i, returnBuffer);
+			System.out.println("  Cached "+blockID+" into cache.");
 			myBufferQueue.add(i);
+			returnBuffer.startFetch();
+
 		}
-		returnBuffer.startFetch();
 		while (returnBuffer.isBusy()) {
 			try {
 				wait();
