@@ -13,23 +13,23 @@ public class WriterThread extends Thread {
 	String myText;
 	byte[] myWriteBuffer;
 	
-	public WriterThread(DeDFS dfs, String text) {
+	public WriterThread(DeDFS dfs, DFileID id, String text) {
 		myDFS = dfs;
-		myID = dfs.createDFile();
+		myID = id;
 		myText = text;
-		System.out.println(myText);
+		//System.out.println(myText);
 	}
 	
-	public WriterThread(DeDFS dfs, File file) throws FileNotFoundException {
+	public WriterThread(DeDFS dfs, DFileID id, File file) throws FileNotFoundException {
 		myDFS = dfs;
-		myID = dfs.createDFile();
+		myID = id;
 		Scanner myScanner = new Scanner(file);
 		myText = "";
 		while (myScanner.hasNext()) {
 			String nextLine = myScanner.next();
 			myText += nextLine+" ";	
 		}
-		System.out.println(myText);
+		//System.out.println(myText);
 	}
 	
 	public void run() {

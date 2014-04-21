@@ -114,5 +114,9 @@ public class DeDBufferCache extends DBufferCache {
 		}
 		return false;
 	}
+	
+	public Hashtable<Integer, DeDBuffer> getCacheTable() {
+		return myCacheTable;
+	}
 
 }

@@ -8,7 +8,10 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Scanner;
 
 import common.Constants;
@@ -21,6 +24,7 @@ public class DeDFS extends DFS {
 	DeDBufferCache myBufferCache;
 	DFileID[] myDFileIDs;
 	ArrayList<Integer> myFilledBlockIDs;
+	ArrayList<Integer> myFilledINodeIDs;
 
 	@Override
 	public void init() {
@@ -28,7 +32,8 @@ public class DeDFS extends DFS {
 		myBufferCache = new DeDBufferCache(Constants.NUM_OF_CACHE_BLOCKS);
 
 		myFilledBlockIDs = new ArrayList<Integer>();
-
+		myFilledINodeIDs = new ArrayList<Integer>();
+		
 		for (int i = 0; i < Constants.MAX_DFILES; i++) {
 			myFilledBlockIDs.add(i);
 		}
@@ -51,15 +56,34 @@ public class DeDFS extends DFS {
 	@Override
 	public void destroyDFile(DFileID dFID) {
 		for (int i = 0; i < myDFileIDs.length; i++) {
-			if (myDFileIDs[i].equals(dFID)) {
+			if (myDFileIDs[i]!=null && myDFileIDs[i].equals(dFID)) {
 				DeDBuffer inodeBuffer = getInodeBuffer(myDFileIDs[i]);
+				byte[] inodeContents = inodeBuffer.getBlockContents();
+				
+				for (int j=4; j<Constants.BLOCK_SIZE; j+=4) {
+					byte[] tempArray = new byte[4];
+					System.arraycopy(inodeContents, j, tempArray, 0, 4);
+					int output = fromByteArray(tempArray);
+					for (int k=0; k<myFilledBlockIDs.size(); k++) {
+						if (myFilledBlockIDs.get(k)==output) {
+							myFilledBlockIDs.remove(k);
+						}
+					}
+					if (output == 0) {
+						break;
+					}
+				}
+				
 				byte[] blockArray = new byte[Constants.BLOCK_SIZE];
 				Arrays.fill(blockArray, (byte) 0);
 				inodeBuffer.write(blockArray, 0, Constants.BLOCK_SIZE);
+				
 				myFilledBlockIDs.remove(i);
 				myDFileIDs[i] = null;
+				myBufferCache.releaseBlock(inodeBuffer);
 			}
 		}
+		System.out.println("File destroyed!");
 	}
 
 	public int fromByteArray(byte[] bytes) {
@@ -72,8 +96,7 @@ public class DeDFS extends DFS {
 		// First, get inode
 		int intSize = 4;
 		DeDBuffer inodeBuffer = getInodeBuffer(dFID);
-		System.out.println("got inode buffer number "
-				+ inodeBuffer.getBlockID());
+		System.out.println("got inode buffer number " + inodeBuffer.getBlockID());
 		byte[] content = inodeBuffer.getBlockContents(); // get the whole block
 		byte[] curBytes = new byte[4];
 		System.arraycopy(content, 0, curBytes, 0, intSize);
@@ -131,13 +154,32 @@ public class DeDFS extends DFS {
 		byte[] blockArray = new byte[Constants.BLOCK_SIZE];
 		Arrays.fill(blockArray, (byte) 0);
 		System.out.println("Getting INode for file " + dFID.getDFileID());
-		DeDBuffer inodeBuffer = (DeDBuffer) myBufferCache.getBlock(dFID
-				.getDFileID());
-		System.out.println("Obtained INode for file "
-				+ inodeBuffer.getBlockID());
+		DeDBuffer inodeBuffer = (DeDBuffer) myBufferCache.getBlock(dFID.getDFileID());
+		System.out.println("Obtained INode for file "+ inodeBuffer.getBlockID());
+		System.out.println("----WRITE CALLED----");
+		
+		boolean overwrite = false;
+		for (int i=0; i<myFilledINodeIDs.size(); i++) {
+			if (myFilledINodeIDs.get(i)==dFID.getDFileID()) {
+				overwrite = true;
+			}
+		}
+		Queue<Integer> existingBlocks = new LinkedList<Integer>();
+		if (overwrite) {
+			byte[] inodeContents = inodeBuffer.getBlockContents();
+			for (int i=4; i<Constants.BLOCK_SIZE; i+=4) {
+				byte[] tempArray = new byte[4];
+				System.arraycopy(inodeContents, i, tempArray, 0, 4);
+				int output = fromByteArray(tempArray);
+				if (output == 0) {
+					break;
+				}
+				existingBlocks.add(output);
+			}
+		}
+		
 		int inodeOffset = 0;
 		System.out.println("Getting size of file...");
-		myBufferCache.releaseBlock(inodeBuffer);
 		int size = sizeDFile(dFID);
 		byte[] b = null;
 		if (count > size) {
@@ -150,13 +192,21 @@ public class DeDFS extends DFS {
 			System.arraycopy(b, 0, blockArray, inodeOffset, b.length);
 		}
 		inodeOffset += b.length;
-		System.out.println("inodeOffset should equal 4: " + inodeOffset);
 		int fileOffset = startOffset;
-		System.out.println("Writing blocks...");
+		System.out.println("----WRITING TO INODE----");
 		for (int bufferOffset = 0; bufferOffset < count; bufferOffset += Constants.BLOCK_SIZE) {
 
 			/* Writing to INODE */
-			int blockNumber = getFreeBlockID();
+			int blockNumber;
+			if (overwrite) {
+				System.out.print("We are overwriting.");
+			}
+			if (overwrite && !existingBlocks.isEmpty()) {
+				blockNumber = existingBlocks.poll();
+			}
+			else {
+				blockNumber = getFreeBlockID();
+			}
 			System.out.println("Free block ID: " + blockNumber);
 			DeDBuffer currentBlockBuffer = (DeDBuffer) myBufferCache
 					.getBlock(blockNumber);
@@ -178,12 +228,15 @@ public class DeDFS extends DFS {
 			System.out.println("bufferOffset:"+bufferOffset+" writelength:"+writeLength+" buffersize:"+buffer.length);
 			System.arraycopy(buffer, bufferOffset, blockContents, 0, writeLength);
 			// writes contents to block
+			System.out.println("----WRITING TO BLOCK :"+blockNumber);
 			currentBlockBuffer.write(blockContents, 0, Constants.BLOCK_SIZE);
 			myBufferCache.releaseBlock(currentBlockBuffer);
 		}
 		// write the whole inode
 		inodeBuffer.write(blockArray, 0, blockArray.length);
 		myBufferCache.releaseBlock(inodeBuffer);
+		myFilledINodeIDs.add(dFID.getDFileID());
+		//sync();
 		return 0;
 	}
 
@@ -207,7 +260,7 @@ public class DeDFS extends DFS {
 
 	@Override
 	public int sizeDFile(DFileID dFID) {
-		DeDBuffer b = (DeDBuffer) myBufferCache.getBlock(dFID.getDFileID());
+		DeDBuffer b = myBufferCache.getCacheTable().get(dFID.getDFileID());
 		byte[] buffer = new byte[4];
 		b.read(buffer, 0, 4);
 		ByteBuffer wrapped = ByteBuffer.wrap(buffer);

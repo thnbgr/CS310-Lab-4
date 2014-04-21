@@ -9,7 +9,7 @@ import dblockcache.*;
 import dfs.*;
 import virtualdisk.*;
 
-public class DeTest {
+public class DeTestWWThreads {
 	public static void main(String[] args) throws InterruptedException, FileNotFoundException {
 		// Initialize DFS
 		DeDFS myDFS = new DeDFS();
