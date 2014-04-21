@@ -81,7 +81,7 @@ public class DeDFS extends DFS {
 				int tempLength = tempBuffer.length;
 				offset += tempLength;
 				// writes to return buffer
-				System.arraycopy(tempBuffer, 0, buffer, offset, tempLength); 
+				System.arraycopy(tempBuffer, 0, buffer, offset, tempLength);
 
 			}
 
@@ -146,7 +146,7 @@ public class DeDFS extends DFS {
 			inodeOffset += Constants.BLOCK_SIZE;
 		}
 		// write the whole inode
-		inodeBuffer.write(blockArray, 0, blockArray.length); 
+		inodeBuffer.write(blockArray, 0, blockArray.length);
 		return 0;
 	}
 
