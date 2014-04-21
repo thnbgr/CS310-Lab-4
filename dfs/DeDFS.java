@@ -99,11 +99,14 @@ public class DeDFS extends DFS {
 
 			if (buffer.length < tempLength) {
 				System.arraycopy(tempBuffer, 0, buffer, offset, buffer.length);
-				System.out.println(buffer[0] + "/ " + buffer[1]);
 			} else {
-				System.out.println("second");
-
+				if (buffer.length - offset < tempLength) {
+					System.out.println("buffer:"+buffer.length+" offset: "+offset+" templength:"+tempLength);
+					System.arraycopy(tempBuffer, 0, buffer, offset, buffer.length - offset);
+				} else {
+				System.out.println("buffer:"+buffer.length+" offset: "+offset+" templength:"+tempLength);
 				System.arraycopy(tempBuffer, 0, buffer, offset, tempLength);
+				}
 			}
 			offset += tempLength;
 
@@ -121,6 +124,9 @@ public class DeDFS extends DFS {
 
 	@Override
 	public int write(DFileID dFID, byte[] buffer, int startOffset, int count) {
+		if (count > Constants.MAX_FILE_SIZE) {
+			return -1;
+		}
 		byte[] blockArray = new byte[Constants.BLOCK_SIZE];
 		Arrays.fill(blockArray, (byte) 0);
 		System.out.println("Getting INode for file " + dFID.getDFileID());
@@ -146,7 +152,7 @@ public class DeDFS extends DFS {
 		System.out.println("inodeOffset should equal 4: " + inodeOffset);
 		int fileOffset = startOffset;
 		System.out.println("Writing blocks...");
-		for (int i = 0; i < count; i += Constants.BLOCK_SIZE) {
+		for (int bufferOffset = 0; bufferOffset < count; bufferOffset += Constants.BLOCK_SIZE) {
 
 			/* Writing to INODE */
 			int blockNumber = getFreeBlockID();
@@ -163,18 +169,16 @@ public class DeDFS extends DFS {
 
 			// copies BLOCK_SIZE array from buffer
 			int writeLength = 0;
-			if (buffer.length < Constants.BLOCK_SIZE) {
-				writeLength = buffer.length;
+			if (buffer.length-bufferOffset < Constants.BLOCK_SIZE) {
+				writeLength = buffer.length-bufferOffset;
 			} else {
 				writeLength = Constants.BLOCK_SIZE;
 			}
-			System.out.println("write length is " + writeLength);
-
-			System.arraycopy(buffer, i, blockContents, 0, writeLength);
+			System.out.println("bufferOffset:"+bufferOffset+" writelength:"+writeLength+" buffersize:"+buffer.length);
+			System.arraycopy(buffer, bufferOffset, blockContents, 0, writeLength);
 			// writes contents to block
 			currentBlockBuffer.write(blockContents, 0, Constants.BLOCK_SIZE);
 			myBufferCache.releaseBlock(currentBlockBuffer);
-			inodeOffset += Constants.BLOCK_SIZE;
 		}
 		// write the whole inode
 		inodeBuffer.write(blockArray, 0, blockArray.length);
@@ -188,6 +192,7 @@ public class DeDFS extends DFS {
 	private int getFreeBlockID() {
 		for (int i = Constants.MAX_DFILES; i < Constants.NUM_OF_BLOCKS; i++) {
 			if (!myFilledBlockIDs.contains(i)) {
+				myFilledBlockIDs.add(i);
 				return i;
 			}
 		}
