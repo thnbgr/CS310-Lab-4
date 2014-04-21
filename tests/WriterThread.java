@@ -27,7 +27,6 @@ public class WriterThread extends Thread {
 		myText = "";
 		while (myScanner.hasNext()) {
 			String nextLine = myScanner.next();
-			System.out.println("next line is: "+nextLine);
 			myText += nextLine+" ";	
 		}
 		System.out.println(myText);
