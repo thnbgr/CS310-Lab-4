@@ -13,10 +13,12 @@ import dblockcache.DBuffer;
 public class DeVirtualDisk extends VirtualDisk {
 
 	Queue<RequestBuffer> requests = new LinkedList<RequestBuffer>();
+	DeVirtualDiskThread myDiskThread = new DeVirtualDiskThread(this);
 	
 	public DeVirtualDisk(String volName, boolean format)
 			throws FileNotFoundException, IOException {
 		super(volName, format);
+		myDiskThread.start();
 	}
 
 	@Override

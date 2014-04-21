@@ -37,6 +37,7 @@ public class DeDBufferCache extends DBufferCache {
 	public synchronized DBuffer getBlock(int blockID) {
  		Integer i = blockID;
  		DeDBuffer returnBuffer = new DeDBuffer(i, myVirtualDisk);
+ 		System.out.println("  Getting Block "+blockID);
 		if (myCacheTable.contains(i)) {
 			returnBuffer = myCacheTable.get(i);
 			myBufferQueue.remove(i);

@@ -77,6 +77,7 @@ public class DeDFS extends DFS {
 			while ((temp = bfReader.read()) != null) { // Reading from inode
 				// Read each block
 				DeDBuffer b = (DeDBuffer) myBufferCache.getBlock(temp);
+				System.out.println("Got Block:" + b.getBlockID());
 				byte[] tempBuffer = b.getBlockContents();
 				int tempLength = tempBuffer.length;
 				offset += tempLength;
@@ -112,6 +113,7 @@ public class DeDFS extends DFS {
 		Arrays.fill(blockArray, (byte) 0);
 		DeDBuffer inodeBuffer = (DeDBuffer) myBufferCache.getBlock(dFID
 				.getDFileID());
+		System.out.println("Creating INode for file "+inodeBuffer.getBlockID());
 		int inodeOffset = 0;
 		int size = sizeDFile(dFID);
 		byte[] b = null;
@@ -127,6 +129,7 @@ public class DeDFS extends DFS {
 		inodeOffset += b.length;
 
 		int fileOffset = startOffset;
+		System.out.println("Writing blocks...");
 		for (int i = 0; i < count; i += Constants.BLOCK_SIZE) {
 			int blockNumber = getFreeBlockID();
 			DeDBuffer currentBlockBuffer = (DeDBuffer) myBufferCache

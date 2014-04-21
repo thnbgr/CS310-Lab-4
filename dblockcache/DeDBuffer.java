@@ -23,6 +23,7 @@ public class DeDBuffer extends DBuffer {
 	public boolean isBusy;
 
 	public DeDBuffer(int i, VirtualDisk v) {
+		myBuffer = new byte[Constants.BLOCK_SIZE];
 		myBlockID = i;
 		isDirty = false;
 		isBusy = false;
@@ -33,7 +34,7 @@ public class DeDBuffer extends DBuffer {
 	public synchronized void startFetch() {
 		
 		isValid = false;
-		
+ 		System.out.println("    Starting Fetch for Block "+myBlockID);
 		try {
 			myVirtualDisk.startRequest(this, Constants.DiskOperationType.READ);
 		} catch (IllegalArgumentException e) {
@@ -43,7 +44,7 @@ public class DeDBuffer extends DBuffer {
 			
 			e.printStackTrace();
 		}
-		
+ 		System.out.println("    Waiting Fetch for Block "+myBlockID);
 		try {
 			waitValid();
 		} catch (InterruptedException e) {
