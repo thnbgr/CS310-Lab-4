@@ -15,7 +15,9 @@ public class DeTest {
 		byte[] myReadBuffer = new byte[2];
 		myWriteBuffer[0] = 'a';
 		myWriteBuffer[1] = 'b';
+		System.out.println("Writing...");
 		myDFS.write(file1, myWriteBuffer, 0, 2);
+		System.out.println("Reading...");
 		myDFS.read(file1, myReadBuffer, 0, 2);
 		System.out.println(myReadBuffer);
 	}
