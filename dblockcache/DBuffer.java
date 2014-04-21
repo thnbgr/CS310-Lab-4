@@ -18,7 +18,7 @@ public abstract class DBuffer {
 	public abstract boolean checkClean();
 	
 	/* Wait until the buffer is clean, i.e., wait until a push operation completes */
-	public abstract boolean waitClean();
+	public abstract boolean waitClean() throws InterruptedException;
 	
 	/* Check if buffer is evictable: not evictable if I/O in progress, or buffer is held */
 	public abstract boolean isBusy();

@@ -17,7 +17,7 @@ public class DeVirtualDiskThread extends Thread{
 		{
 			try {
 				myDisk.handleRequests();
-			} catch (InterruptedException e) {
+			} catch (InterruptedException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

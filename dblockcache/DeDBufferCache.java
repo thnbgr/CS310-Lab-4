@@ -8,7 +8,7 @@ import common.*;
 
 public class DeDBufferCache extends DBufferCache {
 	
-
+ 
 	Hashtable<Integer, DeDBuffer> myCacheTable = new Hashtable<Integer, DeDBuffer>();
 	LinkedList<Integer> myBufferQueue = new LinkedList<Integer>();
 	static VirtualDisk myVirtualDisk;
@@ -45,6 +45,14 @@ public class DeDBufferCache extends DBufferCache {
 		else {
 			if (isFull()) {
 				DeDBuffer evictBuffer = myCacheTable.get(myBufferQueue.get(0));
+				while (evictBuffer.isBusy()) {
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 				Integer evictID = evictBuffer.getBlockID();
 				if (!evictBuffer.checkClean()) {
 					evictBuffer.startPush();
@@ -80,6 +88,18 @@ public class DeDBufferCache extends DBufferCache {
 	*/
 	public void sync() {
 		// Calls startFetch/startPush
+		for(int i = 0; i < numBuffers; i++)
+		{
+			DeDBuffer buff = myCacheTable.get(myBufferQueue.get(i));
+			if(buff.isDirty)
+			{
+				buff.startPush();
+			}
+			if(!buff.isValid)
+			{
+				buff.startFetch();
+			}
+		}
 		// Check all buffers for clean/dirty
 		// Push all dirty buffers, wait for completion
 		

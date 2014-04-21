@@ -67,12 +67,18 @@ public class DeDBuffer extends DBuffer {
 		}
 		// When it completes pushing:
 		// set the dirty condition to return false
+		try {
+			waitClean();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public boolean checkValid() {
 		// TODO Auto-generated method stub
-		return false;
+		return isValid;
 	}
 
 	@Override
@@ -93,15 +99,24 @@ public class DeDBuffer extends DBuffer {
 	}
 
 	@Override
-	public boolean waitClean() {
+	public synchronized boolean waitClean() throws InterruptedException {
 		// TODO Auto-generated method stub
-		return false;
+		while(!checkClean())
+		{
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return true;
 	}
 
 	@Override
 	public boolean isBusy() {
 		// TODO Auto-generated method stub
-		return false;
+		return isBusy;
 	}
 
 	@Override
@@ -146,7 +161,8 @@ public class DeDBuffer extends DBuffer {
 	// This is what notifies
 	public void ioComplete() {
 		isValid = true;
-		notify();
+		isDirty = false;
+		notifyAll();
 	}
 
 	@Override
