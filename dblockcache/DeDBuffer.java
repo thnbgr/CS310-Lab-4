@@ -1,9 +1,8 @@
 package dblockcache;
 
 import java.io.IOException;
-
-import virtualdisk.VirtualDisk;
-import common.Constants.DiskOperationType;
+import virtualdisk.*;
+import common.*;
 
 
 public class DeDBuffer extends DBuffer {
@@ -36,7 +35,7 @@ public class DeDBuffer extends DBuffer {
 		isValid = false;
 		
 		try {
-			myVirtualDisk.startRequest(this, DiskOperationType.READ);
+			myVirtualDisk.startRequest(this, Constants.DiskOperationType.READ);
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -57,7 +56,7 @@ public class DeDBuffer extends DBuffer {
 	public void startPush() {
 		// TODO Auto-generated method stub
 		try {
-			myVirtualDisk.startRequest(this, DiskOperationType.WRITE);
+			myVirtualDisk.startRequest(this, Constants.DiskOperationType.WRITE);
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -173,6 +172,11 @@ public class DeDBuffer extends DBuffer {
 	@Override
 	public byte[] getBuffer() {
 		return myBuffer;
+	}
+
+	public byte[] getBlockContents() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

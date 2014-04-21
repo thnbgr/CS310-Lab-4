@@ -17,7 +17,7 @@ public class DeDBufferCache extends DBufferCache {
 	public DeDBufferCache(int cacheSize) {
 		super(cacheSize);
 		try {
-			myVirtualDisk = new DeVirtualDisk("disk", true);
+			myVirtualDisk = new DeVirtualDisk(Constants.vdiskName, true);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
