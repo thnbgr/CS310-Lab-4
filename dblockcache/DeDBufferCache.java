@@ -109,7 +109,7 @@ public class DeDBufferCache extends DBufferCache {
 	}
 	
 	private boolean isFull() {
-		if (myCacheTable.size() > Constants.NUM_OF_CACHE_BLOCKS) {
+		if (myCacheTable.size() > Constants.NUM_OF_CACHE_BLOCKS-1) {
 			return true;
 		}
 		return false;
