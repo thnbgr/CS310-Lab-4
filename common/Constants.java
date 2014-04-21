@@ -13,7 +13,7 @@ public class Constants {
 	 * should be free of any hard-coded constants.  
 	 */
 
-	public static final int NUM_OF_BLOCKS = 32768;//262144; // 2^18
+	public static final int NUM_OF_BLOCKS = 262144; // 2^18
 	public static final int BLOCK_SIZE = 2048; // 2kB (originally 1024)
 	public static final int INODE_SIZE = 2004; //500*4Bytes + 4Bytes
 	public static final int NUM_OF_CACHE_BLOCKS = 65536; // 2^16
