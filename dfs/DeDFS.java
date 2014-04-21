@@ -109,8 +109,9 @@ public class DeDFS extends DFS {
 				}
 			}
 			offset += tempLength;
-
+			myBufferCache.releaseBlock(b);
 		}
+		myBufferCache.releaseBlock(inodeBuffer);
 
 		return buffer.length;
 	}
