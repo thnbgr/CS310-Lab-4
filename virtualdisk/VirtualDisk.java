@@ -37,12 +37,14 @@ public abstract class VirtualDisk implements IVirtualDisk {
 		 */
 		_file = new RandomAccessFile(_volName, "rws");
 
+
 		/*
 		 * Set the length of the file to be NUM_OF_BLOCKS with each block of
 		 * size BLOCK_SIZE. setLength internally invokes ftruncate(2) syscall to
 		 * set the length.
 		 */
 		_file.setLength(Constants.BLOCK_SIZE * Constants.NUM_OF_BLOCKS);
+
 		if (format) {
 			formatStore();
 		}
@@ -77,6 +79,8 @@ public abstract class VirtualDisk implements IVirtualDisk {
 				int seekLen = i * Constants.BLOCK_SIZE;
 				_file.seek(seekLen);
 				_file.write(b, 0, Constants.BLOCK_SIZE);
+				System.out.println("format end");
+
 			} catch (Exception e) {
 				System.out
 						.println("Error in format: WRITE operation failed at the device block "

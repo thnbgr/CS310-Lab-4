@@ -30,7 +30,7 @@ public class DeDBuffer extends DBuffer {
 	}
 
 	@Override
-	public void startFetch() {
+	public synchronized void startFetch() {
 		
 		isValid = false;
 		
@@ -53,7 +53,7 @@ public class DeDBuffer extends DBuffer {
 	}
 
 	@Override
-	public void startPush() {
+	public synchronized void startPush() {
 		
 		try {
 			myVirtualDisk.startRequest(this, Constants.DiskOperationType.WRITE);
@@ -119,7 +119,7 @@ public class DeDBuffer extends DBuffer {
 	}
 
 	@Override
-	public int read(byte[] buffer, int startOffset, int count) {
+	public synchronized int read(byte[] buffer, int startOffset, int count) {
 		
 		// check valid
 		try {
@@ -137,7 +137,7 @@ public class DeDBuffer extends DBuffer {
 	}
 
 	@Override
-	public int write(byte[] buffer, int startOffset, int count) {
+	public synchronized int write(byte[] buffer, int startOffset, int count) {
 		
 		// check valid
 		try {
@@ -158,7 +158,7 @@ public class DeDBuffer extends DBuffer {
 	@Override
 	/* called when an IO is completed by VirtualDisk (?) */
 	// This is what notifies
-	public void ioComplete() {
+	public synchronized void ioComplete() {
 		isValid = true;
 		isDirty = false;
 		notifyAll();

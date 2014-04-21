@@ -17,18 +17,18 @@ public class DeVirtualDisk extends VirtualDisk {
 	public DeVirtualDisk(String volName, boolean format)
 			throws FileNotFoundException, IOException {
 		super(volName, format);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public void startRequest(DBuffer buf, DiskOperationType operation)
+	public synchronized void startRequest(DBuffer buf, DiskOperationType operation)
 			throws IllegalArgumentException, IOException {
 	
 		RequestBuffer r = new RequestBuffer(buf, operation);
 		requests.add(r);
+		notifyAll();
 	}
 
-	public void handleRequests() throws InterruptedException, IOException{
+	public synchronized void handleRequests() throws InterruptedException, IOException{
 	
 		while(requests.isEmpty())
 		{

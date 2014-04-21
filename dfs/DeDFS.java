@@ -25,6 +25,7 @@ public class DeDFS extends DFS {
 	public void init() {
 		myDFileIDs = new DFileID[Constants.MAX_DFILES];
 		myBufferCache = new DeDBufferCache(Constants.NUM_OF_CACHE_BLOCKS);
+
 		myFilledBlockIDs = new ArrayList<Integer>();
 
 		for (int i = 0; i < Constants.MAX_DFILES; i++) {

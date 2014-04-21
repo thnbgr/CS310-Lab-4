@@ -17,7 +17,7 @@ public class DeDBufferCache extends DBufferCache {
 	public DeDBufferCache(int cacheSize) {
 		super(cacheSize);
 		try {
-			myVirtualDisk = new DeVirtualDisk(Constants.vdiskName, true);
+			myVirtualDisk = new DeVirtualDisk(Constants.vdiskName, false);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -34,7 +34,7 @@ public class DeDBufferCache extends DBufferCache {
 	 * to read block contents into buffer, or write
 	 * contents of buffer into block in virtualDisk */
 	
-	public DBuffer getBlock(int blockID) {
+	public synchronized DBuffer getBlock(int blockID) {
  		Integer i = blockID;
  		DeDBuffer returnBuffer = new DeDBuffer(i, myVirtualDisk);
 		if (myCacheTable.contains(i)) {
@@ -77,7 +77,7 @@ public class DeDBufferCache extends DBufferCache {
 	}
 
 	@Override
-	public void releaseBlock(DBuffer buf) {
+	public synchronized void releaseBlock(DBuffer buf) {
 		DeDBuffer buffer = (DeDBuffer) buf;
 		buffer.isBusy = false;
 		notifyAll();
@@ -86,7 +86,7 @@ public class DeDBufferCache extends DBufferCache {
 	@Override
 	/* Write back all dirty blocks to the volume, and wait for completion. 
 	*/
-	public void sync() {
+	public synchronized void sync() {
 		// Calls startFetch/startPush
 		for(int i = 0; i < numBuffers; i++)
 		{

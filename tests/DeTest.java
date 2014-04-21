@@ -8,6 +8,7 @@ import virtualdisk.*;
 public class DeTest {
 	public static void main(String[] args) throws InterruptedException {
 		DeDFS myDFS = new DeDFS();
+		myDFS.init();
 		DFileID file1 = myDFS.createDFile();
 		//int file1ID = file1.getDFileID();
 		byte[] myWriteBuffer = new byte[2];
