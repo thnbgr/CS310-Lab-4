@@ -16,7 +16,6 @@ public class CrashCheck {
 			crashed = false;
 			boolean writeStart = false;
 			
-			System.out.println("Crash check started");
 			while (myScanner.hasNext()) {
 				String nextLine = myScanner.next();
 				if (nextLine.equals("User")) {

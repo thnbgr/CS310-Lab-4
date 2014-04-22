@@ -33,8 +33,7 @@ public class DeDBuffer extends DBuffer {
 	@Override
 	public synchronized void startFetch() {
 		isValid = false;
- 		System.out.println("    Starting Fetch for Block "+myBlockID);
-		long start = System.nanoTime();
+ 		long start = System.nanoTime();
 		LogWriter.log("  Fetching block #" + myBlockID, start);
 		try {
 			myVirtualDisk.startRequest(this, Constants.DiskOperationType.READ);
@@ -45,8 +44,7 @@ public class DeDBuffer extends DBuffer {
 			
 			e.printStackTrace();
 		}
- 		System.out.println("    Waiting Fetch for Block "+myBlockID);
-		try {
+ 		try {
 			waitValid();
 		} catch (InterruptedException e) {
 			
