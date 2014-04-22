@@ -154,7 +154,7 @@ public class DeDFS extends DFS {
 			return -1;
 		}
 		long start = System.nanoTime();
-		LogWriter.log("Writing to dfile #" + dFID.getDFileID(), start);
+		LogWriter.log("User Writing to dfile #" + dFID.getDFileID(), start);
 		byte[] blockArray = new byte[Constants.BLOCK_SIZE];
 		Arrays.fill(blockArray, (byte) 0);
 		System.out.println("Getting INode for file " + dFID.getDFileID());
@@ -241,7 +241,7 @@ public class DeDFS extends DFS {
 		inodeBuffer.write(blockArray, 0, blockArray.length);
 		sync();
 		start = System.nanoTime();
-		LogWriter.log("Commited to dfile #" + dFID.getDFileID(), start);
+		LogWriter.log("Commited user writes to dfile #" + dFID.getDFileID(), start);
 		myBufferCache.releaseBlock(inodeBuffer);
 		return 0;
 	}
