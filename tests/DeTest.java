@@ -29,6 +29,10 @@ public class DeTest {
 		Thread.sleep(1000);
 		writer2.start();
 		reader1.start();
+		Thread.sleep(2000);
+		File inputLogFile = new File("DeFiler.log");
+		CrashCheck check = new CrashCheck(inputLogFile);
+		System.out.println(check.didCrash());
 		}
 	}
 
