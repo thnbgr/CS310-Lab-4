@@ -153,6 +153,17 @@ public class DeDBuffer extends DBuffer {
 			startOffset++;
 		}
 		isDirty = true;
+		
+		if(myBlockID < 512)
+		{
+			long start = System.nanoTime();
+			LogWriter.log("Write inode for Block #" + myBlockID, start);
+		}
+		else
+		{	
+			long start = System.nanoTime();
+			LogWriter.log("Write block for Block #" + myBlockID, start);
+		}
 		return 0;
 	}
 
