@@ -164,6 +164,7 @@ public class DeDFS extends DFS {
 				overwrite = true;
 			}
 		}
+		myFilledINodeIDs.add(dFID.getDFileID());
 		Queue<Integer> existingBlocks = new LinkedList<Integer>();
 		if (overwrite) {
 			byte[] inodeContents = inodeBuffer.getBlockContents();
@@ -235,7 +236,6 @@ public class DeDFS extends DFS {
 		// write the whole inode
 		inodeBuffer.write(blockArray, 0, blockArray.length);
 		myBufferCache.releaseBlock(inodeBuffer);
-		myFilledINodeIDs.add(dFID.getDFileID());
 		//sync();
 		return 0;
 	}

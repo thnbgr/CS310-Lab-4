@@ -13,10 +13,12 @@ public class DeTestRWThreads {
 		// Initialize DFS
 		DeDFS myDFS = new DeDFS();
 		myDFS.init();
+		// Create DFileIDs
+		DFileID fileName1 = myDFS.createDFile();
 		
 		String filePath = "test1.txt";
 		File inputFile1 = new File(filePath);
-		WriterThread writer1 = new WriterThread(myDFS, inputFile1);
+		WriterThread writer1 = new WriterThread(myDFS, fileName1, inputFile1);
 		DFileID fileID1 = writer1.getFileID();
 		ReaderThread reader1 = new ReaderThread(myDFS, fileID1, 100);
 		writer1.start();
