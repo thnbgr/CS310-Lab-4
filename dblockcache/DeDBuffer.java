@@ -171,6 +171,8 @@ public class DeDBuffer extends DBuffer {
 	/* called when an IO is completed by VirtualDisk (?) */
 	// This is what notifies
 	public synchronized void ioComplete() {
+		long start = System.nanoTime();
+		LogWriter.log("Committed Block #" + myBlockID, start);
 		isValid = true;
 		isDirty = false;
 		notifyAll();
