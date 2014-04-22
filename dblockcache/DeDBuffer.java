@@ -32,9 +32,10 @@ public class DeDBuffer extends DBuffer {
 
 	@Override
 	public synchronized void startFetch() {
-		
 		isValid = false;
  		System.out.println("    Starting Fetch for Block "+myBlockID);
+		long start = System.nanoTime();
+		LogWriter.log("  Fetching block #" + myBlockID, start);
 		try {
 			myVirtualDisk.startRequest(this, Constants.DiskOperationType.READ);
 		} catch (IllegalArgumentException e) {
@@ -55,7 +56,8 @@ public class DeDBuffer extends DBuffer {
 
 	@Override
 	public synchronized void startPush() {
-		
+		long start = System.nanoTime();
+		LogWriter.log("  Pushing block #" + myBlockID, start);
 		try {
 			myVirtualDisk.startRequest(this, Constants.DiskOperationType.WRITE);
 		} catch (IllegalArgumentException e) {
@@ -134,6 +136,16 @@ public class DeDBuffer extends DBuffer {
 			buffer[startOffset] = myBuffer[i];
 			startOffset++;
 		}
+		if(myBlockID < 512)
+		{
+			long start = System.nanoTime();
+			LogWriter.log("Read from inode buffer #" + myBlockID, start);
+		}
+		else
+		{	
+			long start = System.nanoTime();
+			LogWriter.log("Read from data buffer #" + myBlockID, start);
+		}
 		return 0;
 	}
 
@@ -157,12 +169,12 @@ public class DeDBuffer extends DBuffer {
 		if(myBlockID < 512)
 		{
 			long start = System.nanoTime();
-			LogWriter.log("Write inode for Block #" + myBlockID, start);
+			LogWriter.log("Wrote to inode buffer #" + myBlockID, start);
 		}
 		else
 		{	
 			long start = System.nanoTime();
-			LogWriter.log("Write block for Block #" + myBlockID, start);
+			LogWriter.log("Wrote to data buffer #" + myBlockID, start);
 		}
 		return 0;
 	}
@@ -171,8 +183,6 @@ public class DeDBuffer extends DBuffer {
 	/* called when an IO is completed by VirtualDisk (?) */
 	// This is what notifies
 	public synchronized void ioComplete() {
-		long start = System.nanoTime();
-		LogWriter.log("Committed Block #" + myBlockID, start);
 		isValid = true;
 		isDirty = false;
 		notifyAll();

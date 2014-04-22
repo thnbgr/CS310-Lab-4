@@ -16,6 +16,7 @@ import java.util.Scanner;
 
 import common.Constants;
 import common.DFileID;
+import common.LogWriter;
 import dblockcache.DeDBuffer;
 import dblockcache.DeDBufferCache;
 
@@ -37,6 +38,7 @@ public class DeDFS extends DFS {
 		for (int i = 0; i < Constants.MAX_DFILES; i++) {
 			myFilledBlockIDs.add(i);
 		}
+		LogWriter.flush();
 	}
 
 	@Override
@@ -151,6 +153,8 @@ public class DeDFS extends DFS {
 		if (count > Constants.MAX_FILE_SIZE) {
 			return -1;
 		}
+		long start = System.nanoTime();
+		LogWriter.log("Writing to dfile #" + dFID.getDFileID(), start);
 		byte[] blockArray = new byte[Constants.BLOCK_SIZE];
 		Arrays.fill(blockArray, (byte) 0);
 		System.out.println("Getting INode for file " + dFID.getDFileID());
@@ -235,8 +239,10 @@ public class DeDFS extends DFS {
 		}
 		// write the whole inode
 		inodeBuffer.write(blockArray, 0, blockArray.length);
+		sync();
+		start = System.nanoTime();
+		LogWriter.log("Commited to dfile #" + dFID.getDFileID(), start);
 		myBufferCache.releaseBlock(inodeBuffer);
-		//sync();
 		return 0;
 	}
 

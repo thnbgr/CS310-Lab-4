@@ -91,9 +91,9 @@ public class DeDBufferCache extends DBufferCache {
 	*/
 	public synchronized void sync() {
 		// Calls startFetch/startPush
-		for(int i = 0; i < numBuffers; i++)
+		int queueSize = myBufferQueue.size();
+		for(DeDBuffer buff : myCacheTable.values())
 		{
-			DeDBuffer buff = myCacheTable.get(myBufferQueue.get(i));
 			if(buff.isDirty)
 			{
 				buff.startPush();

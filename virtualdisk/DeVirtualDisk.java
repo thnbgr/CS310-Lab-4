@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import common.LogWriter;
 import common.Constants.DiskOperationType;
 import dblockcache.DBuffer;
 
@@ -41,8 +42,12 @@ public class DeVirtualDisk extends VirtualDisk {
 		
 	    if (r.myOperation == DiskOperationType.READ) {
 		    int a = readBlock(r.mybuff);
+			long start = System.nanoTime();
+			LogWriter.log("  Fetched for block #" + r.mybuff.getBlockID(), start);
 	    } else if (r.myOperation == DiskOperationType.WRITE) {
 		    writeBlock(r.mybuff);
+			long start = System.nanoTime();
+			LogWriter.log("  Pushed for block #" + r.mybuff.getBlockID(), start);
 	    }
 	    r.mybuff.ioComplete();
 	}
