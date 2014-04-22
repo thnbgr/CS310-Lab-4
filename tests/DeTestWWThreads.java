@@ -24,7 +24,7 @@ public class DeTestWWThreads {
 		WriterThread writer1 = new WriterThread(myDFS, fileName1, inputFile1);
 		WriterThread writer2 = new WriterThread(myDFS, fileName1, inputFile2);
 		DFileID fileID1 = writer1.getFileID();
-		ReaderThread reader1 = new ReaderThread(myDFS, fileID1, 50000);
+		ReaderThread reader1 = new ReaderThread(myDFS, fileID1, 50000, "test1");
 		writer1.start();
 		Thread.sleep(1000);
 		writer2.start();

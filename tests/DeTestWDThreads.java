@@ -20,8 +20,8 @@ public class DeTestWDThreads {
 		File inputFile1 = new File(filePath1);
 		WriterThread writer1 = new WriterThread(myDFS, fileName1, inputFile1);
 		DFileID fileID1 = writer1.getFileID();
-		ReaderThread reader1 = new ReaderThread(myDFS, fileID1, 100);
-		ReaderThread reader2 = new ReaderThread(myDFS, fileID1, 100);
+		ReaderThread reader1 = new ReaderThread(myDFS, fileID1, 100, "test1");
+		ReaderThread reader2 = new ReaderThread(myDFS, fileID1, 100, "test1");
 		writer1.start();
 		reader1.start();
 		Thread.sleep(1000);
@@ -39,7 +39,7 @@ public class DeTestWDThreads {
 		DFileID fileName2 = myDFS.createDFile();
 		WriterThread writer2 = new WriterThread(myDFS, fileName2, inputFile1);
 		DFileID fileID2 = writer2.getFileID();
-		ReaderThread reader3 = new ReaderThread(myDFS, fileID2, 100);
+		ReaderThread reader3 = new ReaderThread(myDFS, fileID2, 100, "test1");
 		writer2.start();
 		reader3.start();
 		Thread.sleep(1000);

@@ -20,7 +20,7 @@ public class DeTestRWThreads {
 		File inputFile1 = new File(filePath);
 		WriterThread writer1 = new WriterThread(myDFS, fileName1, inputFile1);
 		DFileID fileID1 = writer1.getFileID();
-		ReaderThread reader1 = new ReaderThread(myDFS, fileID1, 100);
+		ReaderThread reader1 = new ReaderThread(myDFS, fileID1, 100, "test1");
 		writer1.start();
 		reader1.start();
 		String output = new String(reader1.getBuffer());
